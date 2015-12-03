@@ -4,7 +4,7 @@ Tool for uploading Energy and Voltage data from Fronius Inverters to pvoutput.or
 ## Requirements
 * Linux (will probably work on any unix)
 * python 2.6+ (not tested on python 3.*)
-* Fronius single-phase Inverter (tested on a Primo 3.0)
+* Fronius single-phase Inverter (tested on a Primo 3.0-1 and Galvo 2.0-1)
 
 ## NOTES
 * Ensure your inverter is in UTC timezone because as of the time of writing the Fronius firmware for the REST API is quite buggy.
