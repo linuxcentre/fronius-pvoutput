@@ -280,8 +280,12 @@ def getInverterArchiveReadings( host, last, endTs = None ):
 	keys = sorted( keysIntList )
 	for k in keys:
 		offset = k
-		profileEnergy = valueData[ str( k ) ]
+		# Do a sanity check that the offset value is > 0
 		thisTs = ts + offset
+		if thisTs <= last['ts']:
+			if opt.debug: print "WARNING: Ignoring returned data which is older than requested. Last TS:%r This TS:%r (offset:%r)" % ( last['ts'], thisTs, offset )
+			continue
+		profileEnergy = valueData[ str( k ) ]
 		dayEnergy = dayEnergy + float( profileEnergy )
 		profileDataByTs[ offset ] = { 'ts':thisTs, 'dayEnergy':dayEnergy, 'inverterVoltage':0 }
 
