@@ -94,7 +94,7 @@ def postBatchReadings( profileData, key, sid ):
 			continue
 
 		# Send request
-		r = requests.post( url, data = batchPayload, headers = headers )
+		r = requests.post( url, data = batchPayload, headers = headers, timeout = 120 )
 		# Interpret responses
 		if r.status_code >= 400:
 			print "ERROR: %r %d bad request: '%s', data: %r" % ( url, r.status_code, r.text, batchPayload )
@@ -124,7 +124,7 @@ def postReading( dayEnergy, inverterVoltage, ts, key, sid ):
 		print "INFO: %r GET OK: 200" % ( url )
 		return True
 
-	r = requests.get( url )
+	r = requests.get( url, timeout = 30 )
 
 	# Interpret responses
 	if r.status_code >= 400:
@@ -162,7 +162,7 @@ def getInverterReading( host ):
 	# Send request
 	url = 'http://' + host + '/solar_api/v1/GetInverterRealtimeData.cgi?Scope=Device&DeviceID=1&DataCollection=CommonInverterData'
 	print "INFO: Getting inverter reading"
-	r = requests.get( url )
+	r = requests.get( url, timeout = 30 )
 	# Interpret responses
 	if r.status_code >= 400:
 		print "ERROR: %s %d bad request: '%s'" % ( url, r.status_code, r.text )
@@ -257,7 +257,7 @@ def getInverterArchiveReadings( host, last, endTs = None ):
 	url = 'http://' + host + '/solar_api/v1/GetArchiveData.cgi?Scope=System&StartDate=%s&EndDate=%s&Channel=EnergyReal_WAC_Sum_Produced' % ( startDate, endDate )
 	# Send request
 	print "INFO: Getting inverter energy archive readings"
-	r = requests.get( url )
+	r = requests.get( url, timeout = 30 )
 	# Interpret responses
 	if r.status_code >= 400:
 		print "ERROR: %s %d bad request: '%s'" % ( url, r.status_code, r.text )
@@ -280,12 +280,8 @@ def getInverterArchiveReadings( host, last, endTs = None ):
 	keys = sorted( keysIntList )
 	for k in keys:
 		offset = k
-		# Do a sanity check that the offset value is > 0
-		thisTs = ts + offset
-		if thisTs <= last['ts']:
-			if opt.debug: print "WARNING: Ignoring returned data which is older than requested. Last TS:%r This TS:%r (offset:%r)" % ( last['ts'], thisTs, offset )
-			continue
 		profileEnergy = valueData[ str( k ) ]
+		thisTs = ts + offset
 		dayEnergy = dayEnergy + float( profileEnergy )
 		profileDataByTs[ offset ] = { 'ts':thisTs, 'dayEnergy':dayEnergy, 'inverterVoltage':0 }
 
@@ -294,7 +290,7 @@ def getInverterArchiveReadings( host, last, endTs = None ):
 	url = 'http://' + host + '/solar_api/v1/GetArchiveData.cgi?Scope=System&StartDate=%s&EndDate=%s&Channel=Voltage_AC_Phase_1' % ( startDate, endDate )
 	# Send request
 	print "INFO: Getting inverter voltage archive readings"
-	r = requests.get( url )
+	r = requests.get( url, timeout = 30 )
 	# Interpret responses
 	if r.status_code >= 400:
 		print "ERROR: %s %d bad request: '%s'" % ( url, r.status_code, r.text )
